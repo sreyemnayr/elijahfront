@@ -2,12 +2,890 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { useContractRead, useAccount, useContractWrite } from 'wagmi'
+import { formatEther } from "viem";
 import { useState, useEffect } from "react";
 
-const elijahNFTAddress = '0x47E6455ce7b46C956336f5961f3EaF8eE76AEA92';
-const elijahERC20Address = '0x339CC434573061775fbd23fE39839bAB9A96f332';
+const elijahNFTAddress = process.env.NEXT_PUBLIC_NFT_ADDRESS  as `0x${string}`;
+const elijahERC20Address = process.env.NEXT_PUBLIC_ERC20_ADDRESS as `0x${string}`;
 
-const elijahNFTABI = [{"inputs":[{"internalType":"address","name":"_ERC20","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"AlreadyInitialized","type":"error"},{"inputs":[],"name":"ApprovalCallerNotOwnerNorApproved","type":"error"},{"inputs":[],"name":"ApprovalQueryForNonexistentToken","type":"error"},{"inputs":[],"name":"BalanceQueryForZeroAddress","type":"error"},{"inputs":[],"name":"MintERC2309QuantityExceedsLimit","type":"error"},{"inputs":[],"name":"MintToZeroAddress","type":"error"},{"inputs":[],"name":"MintZeroQuantity","type":"error"},{"inputs":[],"name":"NewOwnerIsZeroAddress","type":"error"},{"inputs":[],"name":"NoHandoverRequest","type":"error"},{"inputs":[],"name":"NotCompatibleWithSpotMints","type":"error"},{"inputs":[],"name":"OwnerQueryForNonexistentToken","type":"error"},{"inputs":[],"name":"OwnershipNotInitializedForExtraData","type":"error"},{"inputs":[],"name":"SequentialMintExceedsLimit","type":"error"},{"inputs":[],"name":"SequentialUpToTooSmall","type":"error"},{"inputs":[],"name":"SpotMintTokenIdTooSmall","type":"error"},{"inputs":[],"name":"TokenAlreadyExists","type":"error"},{"inputs":[],"name":"TransferCallerNotOwnerNorApproved","type":"error"},{"inputs":[],"name":"TransferFromIncorrectOwner","type":"error"},{"inputs":[],"name":"TransferToNonERC721ReceiverImplementer","type":"error"},{"inputs":[],"name":"TransferToZeroAddress","type":"error"},{"inputs":[],"name":"URIQueryForNonexistentToken","type":"error"},{"inputs":[],"name":"Unauthorized","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"fromTokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"toTokenId","type":"uint256"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"ConsecutiveTransfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverCanceled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverRequested","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"ELIJAH_PRICE","outputs":[{"internalType":"uint80","name":"","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"ETH_PRICE","outputs":[{"internalType":"uint80","name":"","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_PER_MINT","outputs":[{"internalType":"uint24","name":"","type":"uint24"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint24","name":"","type":"uint24"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MINT_STAGE","outputs":[{"internalType":"enum MintStage","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"_checkMintable","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"minters","type":"address[]"}],"name":"addElijahOneMinters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"minters","type":"address[]"}],"name":"addElijahTwoMinters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"minters","type":"address[]"}],"name":"addFreeMinters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"cancelOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"checkMintable","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"completeOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"freeMint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mintWithElijah","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"result","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"ownershipHandoverExpiresAt","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"requestOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"enum MintStage","name":"stage","type":"uint8"}],"name":"updateMintStage","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+const elijahNFTABI =[
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_ERC20",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "nonpayable",
+	  "type": "constructor"
+	},
+	{
+	  "inputs": [],
+	  "name": "AlreadyInitialized",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "ApprovalCallerNotOwnerNorApproved",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "ApprovalQueryForNonexistentToken",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "BalanceQueryForZeroAddress",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "MintERC2309QuantityExceedsLimit",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "MintToZeroAddress",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "MintZeroQuantity",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "NewOwnerIsZeroAddress",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "NoHandoverRequest",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "NotCompatibleWithSpotMints",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "OwnerQueryForNonexistentToken",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "OwnershipNotInitializedForExtraData",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "SequentialMintExceedsLimit",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "SequentialUpToTooSmall",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "SpotMintTokenIdTooSmall",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "TokenAlreadyExists",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "TransferCallerNotOwnerNorApproved",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "TransferFromIncorrectOwner",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "TransferToNonERC721ReceiverImplementer",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "TransferToZeroAddress",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "URIQueryForNonexistentToken",
+	  "type": "error"
+	},
+	{
+	  "inputs": [],
+	  "name": "Unauthorized",
+	  "type": "error"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "owner",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "approved",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "Approval",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "owner",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "operator",
+		  "type": "address"
+		},
+		{
+		  "indexed": false,
+		  "internalType": "bool",
+		  "name": "approved",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "ApprovalForAll",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "uint256",
+		  "name": "fromTokenId",
+		  "type": "uint256"
+		},
+		{
+		  "indexed": false,
+		  "internalType": "uint256",
+		  "name": "toTokenId",
+		  "type": "uint256"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "from",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		}
+	  ],
+	  "name": "ConsecutiveTransfer",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "pendingOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "OwnershipHandoverCanceled",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "pendingOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "OwnershipHandoverRequested",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "oldOwner",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "newOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "OwnershipTransferred",
+	  "type": "event"
+	},
+	{
+	  "anonymous": false,
+	  "inputs": [
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "from",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		},
+		{
+		  "indexed": true,
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "Transfer",
+	  "type": "event"
+	},
+	{
+	  "inputs": [],
+	  "name": "ELIJAH_PRICE",
+	  "outputs": [
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "ETH_PRICE",
+	  "outputs": [
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "MAX_PER_MINT",
+	  "outputs": [
+		{
+		  "internalType": "uint24",
+		  "name": "",
+		  "type": "uint24"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "MAX_SUPPLY",
+	  "outputs": [
+		{
+		  "internalType": "uint24",
+		  "name": "",
+		  "type": "uint24"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "MINT_STAGE",
+	  "outputs": [
+		{
+		  "internalType": "enum MintStage",
+		  "name": "",
+		  "type": "uint8"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address[]",
+		  "name": "minters",
+		  "type": "address[]"
+		}
+	  ],
+	  "name": "addDiscountedMinters",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address[]",
+		  "name": "minters",
+		  "type": "address[]"
+		}
+	  ],
+	  "name": "addFreeMinters",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "approve",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "owner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "balanceOf",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "cancelOwnershipHandover",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_address",
+		  "type": "address"
+		}
+	  ],
+	  "name": "checkMintable",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "pendingOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "completeOwnershipHandover",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_address",
+		  "type": "address"
+		}
+	  ],
+	  "name": "elijahPriceFor",
+	  "outputs": [
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_address",
+		  "type": "address"
+		}
+	  ],
+	  "name": "ethPriceFor",
+	  "outputs": [
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "freeMint",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "getApproved",
+	  "outputs": [
+		{
+		  "internalType": "address",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "owner",
+		  "type": "address"
+		},
+		{
+		  "internalType": "address",
+		  "name": "operator",
+		  "type": "address"
+		}
+	  ],
+	  "name": "isApprovedForAll",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "mint",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "amount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "mintWithElijah",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "name",
+	  "outputs": [
+		{
+		  "internalType": "string",
+		  "name": "",
+		  "type": "string"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "owner",
+	  "outputs": [
+		{
+		  "internalType": "address",
+		  "name": "result",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "ownerOf",
+	  "outputs": [
+		{
+		  "internalType": "address",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "pendingOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "ownershipHandoverExpiresAt",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "result",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "_address",
+		  "type": "address"
+		}
+	  ],
+	  "name": "pricesFor",
+	  "outputs": [
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		},
+		{
+		  "internalType": "uint80",
+		  "name": "",
+		  "type": "uint80"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "renounceOwnership",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "requestOwnershipHandover",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "from",
+		  "type": "address"
+		},
+		{
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "safeTransferFrom",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "from",
+		  "type": "address"
+		},
+		{
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		},
+		{
+		  "internalType": "bytes",
+		  "name": "_data",
+		  "type": "bytes"
+		}
+	  ],
+	  "name": "safeTransferFrom",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "operator",
+		  "type": "address"
+		},
+		{
+		  "internalType": "bool",
+		  "name": "approved",
+		  "type": "bool"
+		}
+	  ],
+	  "name": "setApprovalForAll",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "bytes4",
+		  "name": "interfaceId",
+		  "type": "bytes4"
+		}
+	  ],
+	  "name": "supportsInterface",
+	  "outputs": [
+		{
+		  "internalType": "bool",
+		  "name": "",
+		  "type": "bool"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "symbol",
+	  "outputs": [
+		{
+		  "internalType": "string",
+		  "name": "",
+		  "type": "string"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "token",
+	  "outputs": [
+		{
+		  "internalType": "contract IERC20",
+		  "name": "",
+		  "type": "address"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "tokenURI",
+	  "outputs": [
+		{
+		  "internalType": "string",
+		  "name": "",
+		  "type": "string"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [],
+	  "name": "totalSupply",
+	  "outputs": [
+		{
+		  "internalType": "uint256",
+		  "name": "result",
+		  "type": "uint256"
+		}
+	  ],
+	  "stateMutability": "view",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "from",
+		  "type": "address"
+		},
+		{
+		  "internalType": "address",
+		  "name": "to",
+		  "type": "address"
+		},
+		{
+		  "internalType": "uint256",
+		  "name": "tokenId",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "transferFrom",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "address",
+		  "name": "newOwner",
+		  "type": "address"
+		}
+	  ],
+	  "name": "transferOwnership",
+	  "outputs": [],
+	  "stateMutability": "payable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "string",
+		  "name": "_baseURI",
+		  "type": "string"
+		}
+	  ],
+	  "name": "updateBaseURI",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "enum MintStage",
+		  "name": "stage",
+		  "type": "uint8"
+		}
+	  ],
+	  "name": "updateMintStage",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
+	  "inputs": [
+		{
+		  "internalType": "enum MintStage",
+		  "name": "stage",
+		  "type": "uint8"
+		}
+	  ],
+	  "name": "updateMintStageTESTNET",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	}
+  ]
 const erc20ABI = [
 	{
 		"anonymous": false,
@@ -318,12 +1196,22 @@ export default function Home() {
 
 	const { address } = useAccount();
 
+
+	const [ethPrice, setEthPrice] = useState<bigint>(BigInt(0));
+	const [elijahPrice, setElijahPrice] = useState<bigint>(BigInt(0));
+
 	const { data:mintable, isError:mintableError, isLoading:mintableLoading, refetch:refetchMintable } = useContractRead({
 		address: elijahNFTAddress,
 		abi: elijahNFTABI,
 		functionName: 'checkMintable',
 		args: [address]
 	  })
+	const {data: priceForAddress, isError:priceForAddressError, isLoading:priceForAddressLoading, refetch:refetchPriceForAddress} = useContractRead({
+		address: elijahNFTAddress,
+		abi: elijahNFTABI,
+		functionName: 'pricesFor',
+		args: [address]
+	})
 	const { data: balance, isError:balanceError, isLoading:balanceLoading, refetch:refetchBalance } = useContractRead({
 		address: elijahERC20Address,
 		abi: erc20ABI,
@@ -367,7 +1255,30 @@ export default function Home() {
 		address: elijahERC20Address,
 		abi: erc20ABI,
 		functionName: 'approve',
-		args: [elijahNFTAddress, 1_000_000_000_000_000_000]
+		args: [elijahNFTAddress, BigInt(amount) * elijahPrice]
+	  })
+
+	  const [mintStageUpdate, setMintStageUpdate] = useState<bigint>(BigInt(1));
+
+	  const { data: updatedMintStageTo0, isError:updatedMintStage0Error, isLoading:updatedMintStage0Loading, write:updateMintStageTo0} = useContractWrite({
+		address: elijahNFTAddress,
+		abi: elijahNFTABI,
+		functionName: 'updateMintStageTESTNET',
+		args: [BigInt(0)]
+	  })
+
+	  const { data: updatedMintStageTo1, isError:updatedMintStage1Error, isLoading:updatedMintStage1Loading, write:updateMintStageTo1} = useContractWrite({
+		address: elijahNFTAddress,
+		abi: elijahNFTABI,
+		functionName: 'updateMintStageTESTNET',
+		args: [BigInt(1)]
+	  })
+
+	  const { data: updatedMintStageTo2, isError:updatedMintStage2Error, isLoading:updatedMintStage2Loading, write:updateMintStageTo2} = useContractWrite({
+		address: elijahNFTAddress,
+		abi: elijahNFTABI,
+		functionName: 'updateMintStageTESTNET',
+		args: [BigInt(2)]
 	  })
 
 	  const refreshAll = () => {
@@ -375,11 +1286,45 @@ export default function Home() {
 		refetchBalance();
 		refetchMintStage();
 		refetchIsAllowed();
+		refetchPriceForAddress();
+		if(minted) {
+			setTxHash(minted.hash);
+		}
+		if(mintedWithElijah) {
+			setTxHash(mintedWithElijah.hash);
+		}
+		if(mintedFree) {
+			setTxHash(mintedFree.hash);
+		}
+		if(updatedMintStageTo0) {
+			setTxHash(updatedMintStageTo0.hash);
+		}
+		if(updatedMintStageTo1) {
+			setTxHash(updatedMintStageTo1.hash);
+		}
+		if(updatedMintStageTo2) {
+			setTxHash(updatedMintStageTo2.hash);
+		}
+		if(approvedTx) {
+			setTxHash(approvedTx.hash);
+		}
 	  }
 
-	  useEffect(refreshAll, [approvedTx, minted, mintedWithElijah, mintedFree]);
+	  const [ txHash, setTxHash ] = useState<string>("");
 
-	
+
+
+	  useEffect(refreshAll, [approvedTx, minted, mintedWithElijah, mintedFree, updatedMintStageTo0, updatedMintStageTo1, updatedMintStageTo2]);
+
+
+	  useEffect(() => {
+		if (priceForAddress && typeof(priceForAddress) === 'object') {
+			setEthPrice((priceForAddress as Array<bigint>)[0]);
+			setElijahPrice((priceForAddress as Array<bigint>)[1]);
+		}
+		refetchPriceForAddress();
+	  }, [priceForAddress]);
+
 
 	const closeAll = () => {
 		setIsNetworkSwitchHighlighted(false);
@@ -446,6 +1391,8 @@ export default function Home() {
 							<div>Mint Stage: {((mintStage || 0) as bigint).toString()}</div>
 							<div>Can Mint? {((mintable || false) as boolean).toString()}</div>
 							<div>ELJAH Approved? {((isAllowed || 0) as bigint).toString()}</div>
+							<div>ETH Price: {formatEther(ethPrice as bigint)}</div>
+							<div>ELIJAH Price: {(elijahPrice as bigint).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
 							
 							
 
@@ -459,18 +1406,32 @@ export default function Home() {
 							{!!(mintStage === 2 && mintable) && (
 								<>
 								<input type="number" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
-								{(((isAllowed || 0) as bigint) <= BigInt(0)) ? (
+								{(((isAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) ? (
 									<div>
 										<button onClick={() => approve()}>Approve ELIJAH</button>
 									</div>
 								): (
 									<div>
-									<button onClick={() => mintWithElijah()}>Mint with Elijah</button>
+									<button onClick={() => mintWithElijah()}>Mint with {(elijahPrice * BigInt(amount)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ELIJAH</button>
 									</div>
+									
 								)}
+								<div>
+									<button onClick={() => mint()}>Mint with {formatEther(ethPrice * BigInt(amount))} ETH</button>
+								</div>
 								
 								</>
 							)}
+							{txHash !== "" && (
+								<div><a href={`https://sepolia.basescan.org/tx/${txHash}`} target="_blank">View Transaction</a></div>
+							)}
+							
+
+							<h2 style={{marginTop: '40px'}}>Testnet Helpers</h2>
+							<div><button onClick={() => updateMintStageTo0()}>Update to CLOSED Stage</button></div>
+							<div><button onClick={() => updateMintStageTo1()}>Update to FREE Stage</button></div>
+							<div><button onClick={() => updateMintStageTo2()}>Update to PAYABLE Stage</button></div>
+
 
 							{/* <ul>
 								<li>
