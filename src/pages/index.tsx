@@ -421,9 +421,9 @@ export default function Home() {
 					<div className={styles.container}>
 						<h1>Mint Elijah</h1>
 						<div className={styles.content}>
-							<div>ELIJAH Balance: {(balance as bigint).toString()}</div>
-							<div>Mint Stage: {(mintStage as bigint).toString()}</div>
-							<div>Can Mint? {(mintable as boolean).toString()}</div>
+							<div>ELIJAH Balance: {((balance || 0) as bigint).toString()}</div>
+							<div>Mint Stage: {((mintStage || 0) as bigint).toString()}</div>
+							<div>Can Mint? {((mintable || false) as boolean).toString()}</div>
 
 							{/* <ul>
 								<li>
