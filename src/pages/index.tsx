@@ -1234,7 +1234,8 @@ export default function Home() {
 		address: elijahNFTAddress,
 		abi: elijahNFTABI,
 		functionName: 'mint',
-		args: [address, amount]
+		args: [amount],
+		value: BigInt(amount) * ethPrice
 	  })
 
 	  const { data:mintedWithElijah, isError:mintedWithElijahError, isLoading:mintedWithElijahLoading, write:mintWithElijah} = useContractWrite({
