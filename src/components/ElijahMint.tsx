@@ -346,17 +346,19 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       <div onClick={()=>{
         if(numberOfFreeMints && numberOfFreeMints as bigint > BigInt(0)){
           mintFree();
-        }
-        if(whichCurrency == 'elijah'){
-          if(((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
-            mintWithElijah();
-          } else {
-            approve();
+        } else {
+          if(whichCurrency == 'elijah'){
+            if(((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
+              mintWithElijah();
+            } else {
+              approve();
+            }
+          }
+          if(whichCurrency == 'eth'){
+            mint();
           }
         }
-        if(whichCurrency == 'eth'){
-          mint();
-        }
+        
       }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className={`cursor-pointer ${mintedLoading || mintedWithElijahLoading || mintedFreeLoading ? 'bg-[#00D509]' : 'bg-[#0029FF]'} flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px]  text-center font-ultra text-[50px] leading-[64px] text-white`}>
       { mintable ? canAfford ? "MINT" : whichCurrency == 'elijah' ? "ALLOW" : "SWAP" : "WAIT" }
       </div>
