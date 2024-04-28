@@ -6,11 +6,11 @@ import { WagmiConfig } from "wagmi";
 import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import {
-	baseSepolia,
+	baseSepolia, base
 } from "wagmi/chains";
 
 const chains = [
-	baseSepolia
+	process.env.NEXT_PUBLIC_CHAIN_ID == '884532' ? baseSepolia : base
 ];
 
 // 1. Get projectID at https://cloud.walletconnect.com
