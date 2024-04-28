@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Web3Provider } from '@ethersproject/providers'
 
+import styles from "@/styles/Home.module.css";
+
 import { useAccount, useContractRead, useContractWrite, useNetwork, useSwitchNetwork, useBalance } from "wagmi";
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 
@@ -59,6 +61,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
   const { open: openWalletSelector } = useWeb3Modal();
 
   const [shouldWatch, setShouldWatch] = useState(false);
+  const [shouldWatchFreeMints, setShouldWatchFreeMints] = useState(false);
 
   const [canAfford, setCanAfford] = useState(false);
 	
@@ -100,6 +103,12 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 		functionName: 'checkMintable',
 		args: [address]
 	  })
+    const { data:numberOfFreeMints, isError:numberOfFreeMintsError, isLoading:numberOfFreeMintsLoading, refetch:refetchnumberOfFreeMints } = useContractRead({
+      address: elijahNFTAddress,
+      abi: elijahNFTABI,
+      functionName: 'numberOfFreeMints',
+      args: [address]
+      })
 	const {data: priceForAddress, isError:priceForAddressError, isLoading:priceForAddressLoading, refetch:refetchPriceForAddress} = useContractRead({
 		address: elijahNFTAddress,
 		abi: elijahNFTABI,
@@ -117,7 +126,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 		abi: elijahNFTABI,
 		functionName: 'MINT_STAGE'
 	  })
-	  const { data: isAllowed, isError:isAllowedError, isLoading:isAllowedLoading, refetch:refetchIsAllowed } = useContractRead({
+	  const { data: amtElijahAllowed, isError:amtElijahAllowedError, isLoading:amtElijahAllowedLoading, refetch:refetchamtElijahAllowed } = useContractRead({
 		address: elijahERC20Address,
 		abi: erc20ABI,
 		functionName: 'allowance',
@@ -181,7 +190,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 		refetchMintable();
 		refetchBalance();
 		refetchMintStage();
-		refetchIsAllowed();
+		refetchamtElijahAllowed();
 		refetchPriceForAddress();
 		if(minted) {
 			setTxHash(minted.hash);
@@ -230,18 +239,18 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 	  }, [priceForAddress]);
 
     useEffect(() => {
-      if(mintStage == 1) {
-        setAmount(3);
+      if(numberOfFreeMints && numberOfFreeMints as bigint > 0) {
+        setAmount(Number(numberOfFreeMints as bigint));
       }
-    }, [mintStage])
+    }, [mintStage, numberOfFreeMints])
 
     const [whichCurrency, setWhichCurrency] = useState<"elijah" | "eth">("elijah");
   
 
     useEffect(() => {
-      if(isAllowed && elijahPrice && amount  && whichCurrency) {
+      if((amtElijahAllowed || numberOfFreeMints) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
 
-      if (whichCurrency == 'elijah' && ((isAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
+      if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
         setCanAfford(true);
       } else {
         setCanAfford(false);
@@ -256,7 +265,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       }
         
       
-      if((((isAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' && !canAfford) {
+      if((((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' && !canAfford) {
         setShouldWatch(true);
       } else {
         setShouldWatch(false);
@@ -265,18 +274,19 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
 
 
-    }, [isAllowed, whichCurrency, elijahPrice, ethPrice, amount, canAfford, ethBalance])
+    }, [amtElijahAllowed, whichCurrency, elijahPrice, ethPrice, amount, canAfford, ethBalance, numberOfFreeMints])
 
   
 
   
   return (
+    <>
   <div className="select-none absolute w-[680.31px] h-[907.09px] left-[calc(50%-680.31px/2+0.16px)] top-[calc(50%-907.09px/2-0.45px)]">
     <Face invert={invert} green={mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
     <LowerLinksSection  />
     <div className={`absolute w-[252px] h-[17px] left-[220px] top-[742px] text-center font-mono text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
       <div>{mintable ? canAfford ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
-      {isConnected && (((isAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
+      {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
       {txHash !== "" && (
 								<span><a href={`https://sepolia.basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
 							)}
@@ -329,11 +339,11 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
     {isConnected && (
       <div onClick={()=>{
-        if(mintStage == 1){
+        if(numberOfFreeMints && numberOfFreeMints as bigint > BigInt(0)){
           mintFree();
         }
         if(whichCurrency == 'elijah'){
-          if(((isAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
+          if(((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
             mintWithElijah();
           } else {
             approve();
@@ -355,6 +365,126 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     
     
   </div>
+  {process.env.NEXT_PUBLIC_CHAIN_ID == "84532" && (
+				<div className={styles.wrapper+ ' mt-[100vh]'}>
+					<div className={styles.container }>
+						<h1>Mint Elijah</h1>
+						<div className={styles.content}>
+							<div>ELIJAH Balance: {((balance || 0) as bigint).toString()}</div>
+							<div>Mint Stage: {((mintStage || 0) as bigint).toString()}</div>
+							<div>Can Mint? {((mintable || false) as boolean).toString()}</div>
+							<div>ELJAH Approved? {((amtElijahAllowed || 0) as bigint).toString()}</div>
+							<div>ETH Price: {formatEther(ethPrice as bigint)}</div>
+							<div>ELIJAH Price: {(elijahPrice as bigint).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+              <div>Number of Free Mints: {(numberOfFreeMints as bigint).toString()}</div>
+              <div>Can Afford? {canAfford.toString()}</div>
+							
+							
+
+							
+
+							{!!(mintStage === 1 && mintable) && (
+								<div>
+									<button onClick={() => mintFree()}>Mint 3 Free NFTs</button>
+								</div>
+							)}
+							{!!(mintStage === 2 && mintable) && (
+								<>
+								<input type="number" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
+								{(((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) ? (
+									<div>
+										<button onClick={() => approve()}>Approve ELIJAH</button>
+									</div>
+								): (
+									<div>
+									<button onClick={() => mintWithElijah()}>Mint with {(elijahPrice * BigInt(amount)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ELIJAH</button>
+									</div>
+									
+								)}
+								<div>
+									<button onClick={() => mint()}>Mint with {formatEther(ethPrice * BigInt(amount))} ETH</button>
+								</div>
+								
+								</>
+							)}
+							{txHash !== "" && (
+								<div><a href={`https://sepolia.basescan.org/tx/${txHash}`} target="_blank">View Transaction</a></div>
+							)}
+							
+
+							<h2 style={{marginTop: '40px'}}>Testnet Helpers</h2>
+							<div><button className={`border border-white border-1 p-4`} onClick={() => updateMintStageTo0()}>Update to CLOSED Stage</button></div>
+							<div><button className={`border border-white border-1 p-4`} onClick={() => updateMintStageTo1()}>Update to FREE Stage</button></div>
+							<div><button className={`border border-white border-1 p-4`} onClick={() => updateMintStageTo2()}>Update to PAYABLE Stage</button></div>
+
+
+							{/* <ul>
+								<li>
+									Edit <code>pages/index.tsx</code> and save
+									to reload.
+								</li>
+								<li>
+									Click{" "}
+									<span
+										onClick={() => {
+											setIsConnectHighlighted(
+												!isConnectHighlighted
+											);
+											setIsNetworkSwitchHighlighted(
+												false
+											);
+										}}
+										className={styles.button}
+									>
+										Connect Wallet
+									</span>{" "}
+									to connect to a WalletConnect v2.0
+									compatible wallet.
+								</li>
+								<li>
+									Click{" "}
+									<span
+										onClick={() => {
+											setIsNetworkSwitchHighlighted(
+												!isNetworkSwitchHighlighted
+											);
+											setIsConnectHighlighted(false);
+										}}
+										className={styles.button}
+									>
+										Select Network
+									</span>{" "}
+									to change networks.
+								</li>
+							</ul> */}
+						</div>
+					</div>
+					{/* <div className={styles.footer}>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							height={16}
+							width={16}
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+							/>
+						</svg>
+						<a
+							href="https://docs.walletconnect.com/web3modal/react/about?utm_source=next-starter-template&utm_medium=github&utm_campaign=next-starter-template"
+							target="_blank"
+						>
+							Check out the full documentation here
+						</a>
+					</div> */}
+				</div>
+			)}
+  </>
   );
   }
 
