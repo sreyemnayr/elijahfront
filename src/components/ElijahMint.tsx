@@ -252,7 +252,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
     useEffect(() => {
       setShouldWatchFreeMints(numberOfFreeMints as bigint > 0);
-      
+
       if((amtElijahAllowed || numberOfFreeMints) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
 
       if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
@@ -290,7 +290,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <Face invert={invert} green={mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
     <LowerLinksSection  />
     <div className={`absolute w-[252px] h-[17px] left-[220px] top-[742px] text-center font-mono text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      <div>{mintable ? canAfford ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
+      <div>{mintable ? canAfford ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
       {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
       {txHash !== "" && (
 								<span><a href={`https://sepolia.basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
@@ -324,7 +324,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
   <div onClick={() => {setAmount((c)=>Math.max(1, c - 1))}} className={`cursor-pointer select-none absolute w-[21px] h-[64px] left-0 top-[35px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>-</div>
   )}
     <div className={`absolute w-[207px] h-[17px] left-[53px] top-[110px] text-center font-mono font-normal text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      total = { whichCurrency == 'elijah' ? `${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah` : `${formatEther(ethPrice * BigInt(amount))} ETH` }
+      total = { whichCurrency == 'elijah' ? `${(elijahPrice * BigInt(amount) / BigInt(1_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah` : `${formatEther(ethPrice * BigInt(amount))} ETH` }
     </div>
     </div>
     )}
@@ -375,14 +375,14 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 					<div className={styles.container }>
 						<h1>Mint Elijah</h1>
 						<div className={styles.content}>
-							<div>ELIJAH Balance: {((balance || 0) as bigint).toString()}</div>
-							<div>Mint Stage: {((mintStage || 0) as bigint).toString()}</div>
-							<div>Can Mint? {((mintable || false) as boolean).toString()}</div>
-							<div>ELJAH Approved? {((amtElijahAllowed || 0) as bigint).toString()}</div>
+							<div>ELIJAH Balance: {((balance || 0) as bigint)?.toString() || ''}</div>
+							<div>Mint Stage: {((mintStage || 0) as bigint)?.toString() || ''}</div>
+							<div>Can Mint? {((mintable || false) as boolean)?.toString() || ''}</div>
+							<div>ELJAH Approved? {((amtElijahAllowed || 0) as bigint)?.toString() || ''}</div>
 							<div>ETH Price: {formatEther(ethPrice as bigint)}</div>
-							<div>ELIJAH Price: {(elijahPrice as bigint).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-              <div>Number of Free Mints: {(numberOfFreeMints as bigint).toString()}</div>
-              <div>Can Afford? {canAfford.toString()}</div>
+							<div>ELIJAH Price: {(elijahPrice as bigint)?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+              <div>Number of Free Mints: {(numberOfFreeMints as bigint)?.toString() || ''}</div>
+              <div>Can Afford? {canAfford?.toString() || ''}</div>
 							
 							
 
@@ -402,7 +402,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 									</div>
 								): (
 									<div>
-									<button onClick={() => mintWithElijah()}>Mint with {(elijahPrice * BigInt(amount)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ELIJAH</button>
+									<button onClick={() => mintWithElijah()}>Mint with {(elijahPrice * BigInt(amount))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ELIJAH</button>
 									</div>
 									
 								)}
