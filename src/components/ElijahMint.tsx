@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
+import { Web3Provider } from '@ethersproject/providers'
 
-import { useAccount, useContractRead, useContractWrite, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, useNetwork, useSwitchNetwork, useBalance } from "wagmi";
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 import {elijahNFTAddress, elijahNFTABI, elijahERC20Address, erc20ABI} from "@/web3/config"
 
 import { formatEther } from "viem";
+
+// import { SwapWidget } from '@uniswap/widgets'
+// import '@uniswap/widgets/fonts.css'
 
 /* Face OFF */
 
@@ -53,9 +57,15 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 	const [amount, setAmount] = useState(1);
 
   const { open: openWalletSelector } = useWeb3Modal();
+
+  const [shouldWatch, setShouldWatch] = useState(false);
+
+  const [canAfford, setCanAfford] = useState(false);
 	
 
 	const { address, isConnected, connector } = useAccount();
+
+  const { data: ethBalance } = useBalance({address: address})
 
   const { chain } = useNetwork()
     const { chains, error, isLoading, pendingChainId, switchNetwork } =
@@ -72,6 +82,17 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
 	const [ethPrice, setEthPrice] = useState<bigint>(BigInt(0));
 	const [elijahPrice, setElijahPrice] = useState<bigint>(BigInt(0));
+
+  const [provider, setProvider] = useState<Web3Provider | undefined>()
+  useEffect(() => {
+    if (!connector) {
+      return () => setProvider(undefined)
+    }
+
+    connector.getProvider().then((provider) => {
+      setProvider(new Web3Provider(provider))
+    })
+  }, [connector])
 
 	const { data:mintable, isError:mintableError, isLoading:mintableLoading, refetch:refetchMintable } = useContractRead({
 		address: elijahNFTAddress,
@@ -100,7 +121,8 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 		address: elijahERC20Address,
 		abi: erc20ABI,
 		functionName: 'allowance',
-		args: [address, elijahNFTAddress]
+		args: [address, elijahNFTAddress],
+    watch: shouldWatch
 	  })
 	
 	  const { data:minted, isError:mintedError, isLoading:mintedLoading, isSuccess: mintedSuccess, isIdle: mintedIdle, write:mint} = useContractWrite({
@@ -207,44 +229,91 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 		refetchPriceForAddress();
 	  }, [priceForAddress]);
 
-  const [whichCurrency, setWhichCurrency] = useState("elijah");
+    useEffect(() => {
+      if(mintStage == 1) {
+        setAmount(3);
+      }
+    }, [mintStage])
+
+    const [whichCurrency, setWhichCurrency] = useState<"elijah" | "eth">("elijah");
+  
+
+    useEffect(() => {
+      if(isAllowed && elijahPrice && amount  && whichCurrency) {
+
+      if (whichCurrency == 'elijah' && ((isAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
+        setCanAfford(true);
+      } else {
+        setCanAfford(false);
+      }
+
+      if(whichCurrency == 'eth' && ethBalance) {
+        if((ethBalance.value as bigint) >= ethPrice * BigInt(amount)) {
+          setCanAfford(true);
+        } else {
+          setCanAfford(false);
+        }
+      }
+        
+      
+      if((((isAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' && !canAfford) {
+        setShouldWatch(true);
+      } else {
+        setShouldWatch(false);
+      }
+    }
+
+
+
+    }, [isAllowed, whichCurrency, elijahPrice, ethPrice, amount, canAfford, ethBalance])
+
+  
+
   
   return (
   <div className="select-none absolute w-[680.31px] h-[907.09px] left-[calc(50%-680.31px/2+0.16px)] top-[calc(50%-907.09px/2-0.45px)]">
-    <Face invert={invert} green={mintedLoading || mintedWithElijahLoading || mintedFreeLoading || approveLoading || mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
+    <Face invert={invert} green={mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
     <LowerLinksSection  />
     <div className={`absolute w-[252px] h-[17px] left-[220px] top-[742px] text-center font-mono text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      <div>{mintable ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
+      <div>{mintable ? canAfford ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
       {isConnected && (((isAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
       {txHash !== "" && (
 								<span><a href={`https://sepolia.basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
 							)}
     </div>
     
-    {/* ELIJAH */}
-    <div className="absolute w-[312px] h-[127px] left-[190px] top-[176px]" >
+    {mintable as boolean && (
+      <div className="absolute w-[312px] h-[127px] left-[190px] top-[176px]" >
+    {mintStage as bigint > 1 && (<>
     <div onClick={() => setWhichCurrency('elijah')} className={`cursor-pointer absolute w-[87px] h-[20px] left-[54px] top-0 ${invert ? "text-white" : "text-black"}`}>
     <div className={`absolute flex flex-row justify-center items-center w-[84px] h-[17px] left-0 top-[2px] text-center font-mono ${whichCurrency == 'elijah' ? 'font-bold' : ''} text-[15px] leading-[17px]`}>
     <span className="mr-[10px]">elijah</span> <span className={`h-[17px] w-[17px] border-4 rounded-full inline-block ${invert ? (whichCurrency == 'elijah' ? 'bg-white border-white' : 'bg-black border-black') : ((whichCurrency == 'elijah' ? 'bg-black border-black' : 'bg-white border-black'))}`}></span>
   </div>
   </div>
 
-    {/* ETH */}
     <div className={`absolute w-[87px] h-[20px] left-[164px] top-0 ${invert ? "text-white" : "text-black"}`} >
       <div onClick={() => {setWhichCurrency('eth')}} className={`cursor-pointer absolute w-[84px] h-[17px] left-[27px] top-[2px] text-left font-mono ${whichCurrency == 'eth' ? 'font-bold' : ''} text-[15px] leading-[17px] `}>
         <span  className={`h-[17px] w-[17px] border-4 rounded-full inline-block ${invert ? (whichCurrency == 'eth' ? 'bg-white border-white' : 'bg-black border-white') : ((whichCurrency == 'eth' ? 'bg-black border-black' : 'bg-white border-black'))}`}></span>
         <span className={`ml-[10px]`}>eth</span>
       </div>  
     </div>
-    <div onClick={() => {setAmount(amount + 1)}} className={`cursor-pointer absolute w-[36px] h-[64px] left-[276px] top-[37px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>+</div>
-      <div className={`box-border absolute w-[228px] h-[62px] left-[38px] top-[37px] border-2 ${invert ? "border-white" : "border-black"} text-center font-ultra text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>
+    </>)}
+
+    {mintStage as bigint > 1 && (
+       <div onClick={() => {setAmount((c)=>Math.min(42, c + 1))}} className={`cursor-pointer absolute w-[36px] h-[64px] left-[276px] top-[37px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>+</div>
+    ) }
+    <div className={`box-border absolute w-[228px] h-[62px] left-[38px] top-[37px] border-2 ${invert ? "border-white" : "border-black"} text-center font-ultra text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>
     {amount}
   </div>
-  <div onClick={() => {setAmount(amount - 1)}} className={`cursor-pointer select-none absolute w-[21px] h-[64px] left-0 top-[35px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>-</div>
+  {mintStage as bigint > 1 && (
+  <div onClick={() => {setAmount((c)=>Math.max(1, c - 1))}} className={`cursor-pointer select-none absolute w-[21px] h-[64px] left-0 top-[35px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>-</div>
+  )}
     <div className={`absolute w-[207px] h-[17px] left-[53px] top-[110px] text-center font-mono font-normal text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
       total = { whichCurrency == 'elijah' ? `${(elijahPrice * BigInt(amount) / BigInt(1_000_000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah` : `${formatEther(ethPrice * BigInt(amount))} ETH` }
     </div>
     </div>
+    )}
+    
 
     
     
@@ -273,11 +342,16 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
         if(whichCurrency == 'eth'){
           mint();
         }
-      }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className="cursor-pointer focus:bg-[#00D509] flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px] bg-[#0029FF] text-center font-ultra text-[50px] leading-[64px] text-white">
-      { mintable ? (((isAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) || whichCurrency == 'eth' ? "MINT" : "ALLOW" : "WAIT" }
+      }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className={`cursor-pointer ${mintedLoading || mintedWithElijahLoading || mintedFreeLoading ? 'bg-[#00D509]' : 'bg-[#0029FF]'} flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px]  text-center font-ultra text-[50px] leading-[64px] text-white`}>
+      { mintable ? canAfford ? "MINT" : whichCurrency == 'elijah' ? "ALLOW" : "SWAP" : "WAIT" }
       </div>
     )}
     
+    {/* {isConnected && provider && (
+      <div className="Uniswap">
+      <SwapWidget provider={provider} />
+    </div> 
+    )} */}
     
     
   </div>
@@ -645,21 +719,21 @@ const Blur = () => (
 );
 
 const Wheelpaper = () => (
-  <div className="absolute w-[90px] h-[17px] left-[272px] top-[631.09px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-0.06deg]">
+  <a href="https://elijahwheel.com/wheelpaper" target="_blank" className="absolute w-[90px] h-[17px] left-[272px] top-[631.09px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-0.06deg]">
     wheelpaper
-  </div>
+  </a>
 );
 
 const Dexscreen = () => (
-  <div className="absolute w-[81px] h-[17px] left-[548px] top-[390px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-69.03deg]">
+  <a href="https://dexscreener.com/base/0x678870f4372c6fab50dfb14b41dec721446546a7" target="_blank" className="absolute w-[81px] h-[17px] left-[548px] top-[390px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-69.03deg]">
     dexscreen
-  </div>
+  </a>
 );
 
 const Dextools = () => (
-  <div className="absolute w-[72px] h-[17px] left-[-4px] top-[390px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-107.44deg]">
+  <a href="https://www.dextools.io/app/en/base/pair-explorer/0x678870f4372c6fab50dfb14b41dec721446546a7" target="_blank" className="absolute w-[72px] h-[17px] left-[-4px] top-[390px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-107.44deg]">
     dextools
-  </div>
+  </a>
 );
 
 const Basescan = () => (
@@ -759,22 +833,22 @@ const Basescan = () => (
 
 
 const Twitter = () => (
-  <a href="https://twitter.com/elijah_mint" target="_blank" className="absolute w-[63px] h-[17px] left-[206px] top-[20px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-91.43deg] peer-has-hover:text-white">
+  <a href="https://twitter.com/elijahwheeel" target="_blank" className="absolute w-[63px] h-[17px] left-[206px] top-[20px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-91.43deg] peer-has-hover:text-white">
     twitter
   </a>
 );
 
 const Telegram = () => (
-  <div className="hover:text-red peer absolute w-[63px] h-[17px] left-[206px] top-[120px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-90.24deg]">
+  <a href="https://t.me/elijahwheel" target="_blank" className="hover:text-red peer absolute w-[63px] h-[17px] left-[206px] top-[120px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-90.24deg]">
     telegram
-  </div>
+  </a>
 );
 
 
 const SwapToElijah = () => (
-  <div className="absolute w-[226px] h-[17px] left-[261px] top-[96px] text-center font-mono text-[15px] leading-[17px] text-[#0029FF]">
+  <a href="https://app.uniswap.org/explore/tokens/base/0x1a28945c059d43dd57f7ac049059b7a2ff1d56ec" target="_blank" className="absolute w-[226px] h-[17px] left-[261px] top-[96px] text-center font-mono text-[15px] leading-[17px] text-[#0029FF]">
     swap to elijah
-  </div>
+  </a>
 );
 
 // /* Button */
