@@ -107,7 +107,8 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       address: elijahNFTAddress,
       abi: elijahNFTABI,
       functionName: 'numberOfFreeMints',
-      args: [address]
+      args: [address],
+      watch: shouldWatchFreeMints
       })
 	const {data: priceForAddress, isError:priceForAddressError, isLoading:priceForAddressLoading, refetch:refetchPriceForAddress} = useContractRead({
 		address: elijahNFTAddress,
@@ -245,9 +246,13 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     }, [mintStage, numberOfFreeMints])
 
     const [whichCurrency, setWhichCurrency] = useState<"elijah" | "eth">("elijah");
+
+    
   
 
     useEffect(() => {
+      setShouldWatchFreeMints(numberOfFreeMints as bigint > 0);
+      
       if((amtElijahAllowed || numberOfFreeMints) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
 
       if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
