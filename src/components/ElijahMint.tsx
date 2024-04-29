@@ -322,7 +322,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
   <div onClick={() => {setAmount((c)=>Math.max(1, c - 1))}} className={`cursor-pointer select-none absolute w-[21px] h-[64px] left-0 top-[35px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>-</div>
   )}
     <div className={`absolute w-[207px] h-[17px] left-[53px] top-[110px] text-center font-mono font-normal text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      total = { whichCurrency == 'elijah' ? `${(elijahPrice * BigInt(amount) / BigInt(1_000_000_000_000_000_000_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah` : `${formatEther(ethPrice * BigInt(amount))} ETH` }
+      total = { numberOfFreeMints as bigint > 0 ? "$free" : whichCurrency == 'elijah' ? `${(elijahPrice * BigInt(amount) / BigInt(1_000_000_000_000_000_000_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah` : `${formatEther(ethPrice * BigInt(amount))} ETH` }
     </div>
     </div>
     )}
