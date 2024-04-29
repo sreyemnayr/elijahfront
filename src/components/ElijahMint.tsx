@@ -299,7 +299,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 								<span><a href={`https://sepolia.basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
 							)}
     </div>
-    
+
     
     {mintable as boolean && (
       <div className="absolute w-[312px] h-[127px] left-[190px] top-[176px]" >
@@ -346,27 +346,33 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <SwapToElijah />
   </div>
 
-    {isConnected && (
+    
       <div onClick={()=>{
-        if(numberOfFreeMints && numberOfFreeMints as bigint > BigInt(0)){
-          mintFree();
+        if (!isConnected) {
+          openWalletSelector();
         } else {
-          if(whichCurrency == 'elijah'){
-            if(((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
-              mintWithElijah();
-            } else {
-              approve();
+          if(numberOfFreeMints && numberOfFreeMints as bigint > BigInt(0)){
+            mintFree();
+          } else {
+            if(whichCurrency == 'elijah') {
+              if(((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)){
+                mintWithElijah();
+              } else {
+                approve();
+              }
+            }
+            if(whichCurrency == 'eth'){
+              mint();
             }
           }
-          if(whichCurrency == 'eth'){
-            mint();
-          }
+
         }
         
+        
       }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className={`cursor-pointer ${mintedLoading || mintedWithElijahLoading || mintedFreeLoading ? 'bg-[#00D509]' : 'bg-[#0029FF]'} flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px]  text-center font-ultra text-[50px] leading-[64px] text-white`}>
-      { mintable ? canAfford ? "MINT" : whichCurrency == 'elijah' ? "ALLOW" : "SWAP" : "WAIT" }
+      { isConnected ? (mintable ? (canAfford ? "MINT" : (whichCurrency == 'elijah' ? "ALLOW" : "SWAP")) : "WAIT") : "CNKT" }
       </div>
-    )}
+    
     
     {/* {isConnected && provider && (
       <div className="Uniswap">
@@ -854,7 +860,7 @@ const Opensea = () => (
 );
 
 const Blur = () => (
-  <a href="https://magiceden.io/collections/base/0x100e65e30356436e5aF386E80F822ae63238D7FE" target="_blank" className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
+  <a href="https://magiceden.io/collections/base/0x13394b9cE1b7188a0921188231cD8b980121eB83" target="_blank" className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
     magiceden
   </a>
 );
@@ -878,7 +884,7 @@ const Dextools = () => (
 );
 
 const Basescan = () => (
-  <a href="https://basescan.org/address/0x100e65e30356436e5aF386E80F822ae63238D7FE" target="_blank" className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
+  <a href="https://basescan.org/address/0x13394b9cE1b7188a0921188231cD8b980121eB83" target="_blank" className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
     basescan
   </a>
 );
@@ -988,7 +994,7 @@ const Telegram = () => (
 
 const SwapToElijah = () => (
   <a href="https://app.uniswap.org/explore/tokens/base/0x1a28945c059d43dd57f7ac049059b7a2ff1d56ec" target="_blank" className="absolute w-[226px] h-[17px] left-[261px] top-[96px] text-center font-mono text-[15px] leading-[17px] text-[#0029FF]">
-    swap to elijah
+    swap more $elijah
   </a>
 );
 
