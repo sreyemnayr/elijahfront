@@ -415,7 +415,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 								</>
 							)}
 							{txHash !== "" && (
-								<div><a href={`https://sepolia.basescan.org/tx/${txHash}`} target="_blank">View Transaction</a></div>
+								<div><a href={`https://basescan.org/tx/${txHash}`} target="_blank">View Transaction</a></div>
 							)}
 							
 
