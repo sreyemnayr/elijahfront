@@ -844,15 +844,15 @@ const LowerLinksSection = () => (
 );
 
 const Opensea = () => (
-  <a href="https://opensea.io/collection/elijah-mint" target="_blank" className="absolute w-[63px] h-[17px] left-[528px] top-[48px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[72.21deg]">
+  <a href="https://opensea.io/collection/elijahwheel" target="_blank" className="absolute w-[63px] h-[17px] left-[528px] top-[48px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[72.21deg]">
     opensea
   </a>
 );
 
 const Blur = () => (
-  <div className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
-    blur
-  </div>
+  <a href="https://magiceden.io/collections/base/0x100e65e30356436e5aF386E80F822ae63238D7FE" target="_blank" className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
+    magiceden
+  </a>
 );
 
 const Wheelpaper = () => (
@@ -874,9 +874,9 @@ const Dextools = () => (
 );
 
 const Basescan = () => (
-  <div className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
+  <a href="https://basescan.org/address/0x100e65e30356436e5aF386E80F822ae63238D7FE" target="_blank" className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
     basescan
-  </div>
+  </a>
 );
 
 
