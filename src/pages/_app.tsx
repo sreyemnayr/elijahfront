@@ -10,7 +10,7 @@ import {
 } from "wagmi/chains";
 
 const chains = [
-	process.env.NEXT_PUBLIC_CHAIN_ID == '884532' ? baseSepolia : base
+	process.env.NEXT_PUBLIC_CHAIN_ID == '84532' ? baseSepolia : base
 ];
 
 // 1. Get projectID at https://cloud.walletconnect.com
