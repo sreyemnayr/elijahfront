@@ -208,7 +208,9 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
 	  const [ txHash, setTxHash ] = useState<string>("");
 
-
+    useEffect(() => {
+      mintWithElijah();
+    }, [approveSuccess])
 
 	  useEffect(refreshAll, [approvedTx, approveSuccess, minted, mintedWithElijah, mintedFree, updatedMintStageTo0, updatedMintStageTo1, updatedMintStageTo2]);
 
