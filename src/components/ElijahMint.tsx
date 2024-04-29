@@ -284,7 +284,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <Face invert={invert} green={mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
     <LowerLinksSection  />
     <div className={`absolute w-[252px] h-[17px] left-[220px] top-[742px] text-center font-mono text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      <div>{mintable ? canAfford ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
+      <div>{mintable ? (canAfford || numberOfFreeMints as bigint > 0) ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${(elijahPrice * BigInt(amount) / BigInt(1_000_000))?.toString() || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
       {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
       {(mintedSuccess || mintedFreeSuccess || mintedWithElijahSuccess) && (
         <span>grats, you minted {amount} elijah wheel</span>
