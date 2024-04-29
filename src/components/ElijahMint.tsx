@@ -10,16 +10,6 @@ import {elijahNFTAddress, elijahNFTABI, elijahERC20Address, erc20ABI} from "@/we
 
 import { formatEther } from "viem";
 
-// import { SwapWidget } from '@uniswap/widgets'
-// import '@uniswap/widgets/fonts.css'
-
-/* Face OFF */
-
-/* position: absolute;
-width: 680.31px;
-height: 907.09px;
-left: calc(50% - 680.31px/2 + 0.16px);
-top: calc(50% - 907.09px/2 - 0.45px); */
 
 const cached_styles = [
   "text-black",
@@ -256,7 +246,11 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       if((amtElijahAllowed || numberOfFreeMints) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
 
       if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
-        setCanAfford(true);
+        if(balance && balance as bigint >= elijahPrice * BigInt(amount)) {
+          setCanAfford(true);
+        } else {
+          setCanAfford(false);
+        }
       } else {
         setCanAfford(false);
       }
@@ -340,7 +334,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <div className="absolute w-[387px] h-[163.07px] left-[102px] top-[361px]">
     <Twitter />
     <Telegram />
-    <div onClick={()=>openWalletSelector()} className="absolute w-[226px] h-[17px] left-0 top-[96px] text-center font-mono text-[15px] leading-[17px] text-[#0029FF]">
+    <div onClick={()=>openWalletSelector()} className="cursor-pointer absolute w-[226px] h-[17px] left-0 top-[96px] text-center font-mono text-[15px] leading-[17px] text-[#0029FF]">
     {isConnected ? "manage" : "connect"} wallet
   </div>
     <SwapToElijah />
