@@ -300,6 +300,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 							)}
     </div>
     
+    
     {mintable as boolean && (
       <div className="absolute w-[312px] h-[127px] left-[190px] top-[176px]" >
     {mintStage as bigint > 1 && (<>
