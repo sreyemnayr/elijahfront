@@ -296,7 +296,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
         <span>grats, you minted {amount} elijah wheel</span>
       )}
       {txHash !== "" && (
-								<span><a href={`https://sepolia.basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
+								<span><a href={`https://basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
 							)}
     </div>
 
