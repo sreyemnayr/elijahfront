@@ -364,7 +364,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
         
         
       }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className={`cursor-pointer ${mintedLoading || mintedWithElijahLoading || mintedFreeLoading ? 'bg-[#00D509]' : 'bg-[#0029FF]'} flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px]  text-center font-ultra text-[50px] leading-[64px] text-white`}>
-      { isConnected ? (mintable ? (canAfford ? "MINT" : (whichCurrency == 'elijah' ? "ALLOW" : "SWAP")) : "WAIT") : "CNKT" }
+      { isConnected ? (mintable ? ((canAfford || numberOfFreeMints as bigint > 0) ? "MINT" : (whichCurrency == 'elijah' ? "ALLOW" : "SWAP")) : "WAIT") : "CNKT" }
       </div>
     
     
