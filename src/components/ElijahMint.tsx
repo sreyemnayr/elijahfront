@@ -284,13 +284,18 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <Face invert={invert} green={mintedSuccess || mintedWithElijahSuccess || mintedFreeSuccess } />
     <LowerLinksSection  />
     <div className={`absolute w-[252px] h-[17px] left-[220px] top-[742px] text-center font-mono text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
-      <div>{mintable ? (canAfford || numberOfFreeMints as bigint > 0) ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${formatEther(elijahPrice * BigInt(amount) / BigInt(1_000_000)) || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice)} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
-      {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
-      {(mintedSuccess || mintedFreeSuccess || mintedWithElijahSuccess) && (
+      
+      
+      {(mintedSuccess || mintedFreeSuccess || mintedWithElijahSuccess) ? (
         <span>grats, you minted {amount} elijah wheel</span>
+      ) : (
+        <>
+        <div>{mintable ? (canAfford || numberOfFreeMints as bigint > 0) ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${formatEther(elijahPrice * BigInt(amount) / BigInt(1_000_000)) || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice * BigInt(amount))} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
+        {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
+        </>
       )}
       {txHash !== "" && (
-								<span><a href={`https://basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></span>
+								<div><a href={`https://basescan.org/tx/${txHash}`} className={`${invert ? 'text-black' : 'text-[#00D509]'} underline`} target="_blank">view tx</a></div>
 							)}
     </div>
 
@@ -340,7 +345,9 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     <SwapToElijah />
   </div>
 
-    
+  {(mintedSuccess || mintedFreeSuccess || mintedWithElijahSuccess) ? (
+    <></>
+  ) :(
       <div onClick={()=>{
         if (!isConnected) {
           openWalletSelector();
@@ -366,13 +373,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       }} onMouseEnter={() => setInvert(true)} onMouseLeave={() => setInvert(false)} className={`cursor-pointer ${mintedLoading || mintedWithElijahLoading || mintedFreeLoading ? 'bg-[#00D509]' : 'bg-[#0029FF]'} flex flex-row justify-center items-center p-[15px_30px] gap-2.5 absolute w-[229px] h-[94px] left-[calc(50%-229px/2+0.35px)] top-[631px]  text-center font-ultra text-[50px] leading-[64px] text-white`}>
       { isConnected ? (mintable ? ((canAfford || numberOfFreeMints as bigint > 0) ? "MINT" : (whichCurrency == 'elijah' ? "ALLOW" : "SWAP")) : "WAIT") : "CNKT" }
       </div>
-    
-    
-    {/* {isConnected && provider && (
-      <div className="Uniswap">
-      <SwapWidget provider={provider} />
-    </div> 
-    )} */}
+  )}
     
     
   </div>
