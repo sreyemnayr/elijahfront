@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers'
 
 import styles from "@/styles/Home.module.css";
 
-import { useAccount, useContractRead, useContractWrite, useNetwork, useSwitchNetwork, useBalance } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, useNetwork, useSwitchNetwork, useBalance, useWaitForTransaction } from "wagmi";
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 import {elijahNFTAddress, elijahNFTABI, elijahERC20Address, erc20ABI} from "@/web3/config"
@@ -208,9 +208,9 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
 	  const [ txHash, setTxHash ] = useState<string>("");
 
-    useEffect(() => {
-      mintWithElijah();
-    }, [approveSuccess])
+    // useEffect(() => {
+    //   mintWithElijah();
+    // }, [approveSuccess])
 
 	  useEffect(refreshAll, [approvedTx, approveSuccess, minted, mintedWithElijah, mintedFree, updatedMintStageTo0, updatedMintStageTo1, updatedMintStageTo2]);
 
@@ -276,6 +276,13 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
 
 
     }, [amtElijahAllowed, whichCurrency, elijahPrice, ethPrice, amount, canAfford, ethBalance, numberOfFreeMints])
+
+    const {data: allowData, status: allowStatus} = useWaitForTransaction({
+      hash: approvedTx?.hash,
+      onSuccess: () => {
+        mintWithElijah();
+      }
+    })
 
   
 
