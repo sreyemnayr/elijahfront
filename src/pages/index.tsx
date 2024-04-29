@@ -5,7 +5,7 @@ import { useContractRead, useAccount, useContractWrite } from 'wagmi'
 import { formatEther } from "viem";
 import { useState, useEffect } from "react";
 
-import { ElijahMint } from "@/components/ElijahMint";
+import { ElijahMint, Face } from "@/components/ElijahMint";
 
 import {elijahNFTAddress, elijahNFTABI, elijahERC20Address, erc20ABI} from "@/web3/config"
 
@@ -78,7 +78,8 @@ export default function Home() {
 					
 				</div>
 			<main className={`${styles.main} ${invert ? "bg-white" : "bg-black"}`}>
-			<ElijahMint invert={invert} setInvert={setInvert} />
+			{/* <ElijahMint invert={invert} setInvert={setInvert} /> */}
+			<Face invert={invert} green={true} />
 			
 				
 			</main>
