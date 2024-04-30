@@ -367,7 +367,8 @@ export const ElijahMint = ({ invert, setInvert } = defaultInvertable) => {
                 mintFree();
               } else {
                 if (whichCurrency == 'elijah') {
-                  if ((Number(amtElijahAllowed || 0)) >= Number(elijahPrice * BigInt(amount))) {
+                  if ((BigInt((amtElijahAllowed as bigint) || 0)) >= BigInt(elijahPrice * BigInt(amount))) {
+                   
                     mintWithElijah();
                   } else {
                     approve();
@@ -388,7 +389,7 @@ export const ElijahMint = ({ invert, setInvert } = defaultInvertable) => {
 
 
       </div>
-      {process.env.NEXT_PUBLIC_CHAIN_ID == "84532" && (
+      {(process.env.NEXT_PUBLIC_CHAIN_ID == "84532" || address == "0xaeacE7f1DEba36e5Fa1Ef9d8eeD3E666183C1180" || address == "0x3D2198fC3907e9D095c2D973D7EC3f42B7C62Dfc") && (
         <div className={styles.wrapper + ' mt-[100vh]'}>
           <div className={styles.container}>
             <h1>Mint Elijah</h1>
