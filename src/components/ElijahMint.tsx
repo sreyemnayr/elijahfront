@@ -246,7 +246,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     useEffect(() => {
       setShouldWatchFreeMints(numberOfFreeMints as bigint > 0);
 
-      if((amtElijahAllowed || numberOfFreeMints || (whichCurrency == "eth" && ethBalance)) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
+      if((amtElijahAllowed || numberOfFreeMints || (whichCurrency == "eth" && ethBalance)) && (elijahPrice || numberOfFreeMints || (whichCurrency == "eth" && ethBalance)) && mintStage && amount  && whichCurrency) {
 
       if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
         if(balance && balance as bigint >= elijahPrice * BigInt(amount)) {
