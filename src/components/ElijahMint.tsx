@@ -282,7 +282,8 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
       hash: approvedTx?.hash,
       onSuccess: () => {
         mintWithElijah();
-      }
+      },
+      enabled: (approvedTx?.hash != undefined)
     })
 
   
