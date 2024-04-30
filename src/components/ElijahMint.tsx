@@ -865,7 +865,7 @@ const Opensea = () => (
 );
 
 const Blur = () => (
-  <a href="https://magiceden.io/collections/base/0x13394b9cE1b7188a0921188231cD8b980121eB83" target="_blank" className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
+  <a href="https://magiceden.io/collections/base/0xA8aebd5e1664e33FFccB86DA1686601d90BFa01D" target="_blank" className="absolute w-[36px] h-[17px] left-[52px] top-[50.36px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[-67.93deg]">
     magiceden
   </a>
 );
@@ -889,7 +889,7 @@ const Dextools = () => (
 );
 
 const Basescan = () => (
-  <a href="https://basescan.org/address/0x13394b9cE1b7188a0921188231cD8b980121eB83" target="_blank" className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
+  <a href="https://basescan.org/address/0x1a28945C059d43dD57f7ac049059b7A2fF1D56Ec" target="_blank" className="absolute w-[72px] h-[17px] left-[280px] top-[-161px] text-center font-mono text-[15px] leading-[17px] text-[#FF00A8] rotate-[0.48deg]">
     basescan
   </a>
 );
