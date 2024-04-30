@@ -246,7 +246,7 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     useEffect(() => {
       setShouldWatchFreeMints(numberOfFreeMints as bigint > 0);
 
-      if((amtElijahAllowed || numberOfFreeMints) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
+      if((amtElijahAllowed || numberOfFreeMints || (whichCurrency == "eth" && ethBalance)) && (elijahPrice || numberOfFreeMints) && mintStage && amount  && whichCurrency) {
 
       if (whichCurrency == 'elijah' && ((amtElijahAllowed || 0) as bigint) >= elijahPrice * BigInt(amount)) {
         if(balance && balance as bigint >= elijahPrice * BigInt(amount)) {
@@ -300,8 +300,8 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
         <span>grats, you minted {amount} elijah wheel</span>
       ) : (
         <>
-        <div>{mintable ? (canAfford || numberOfFreeMints as bigint > 0) ? (<span>grats! you can mint {mintStage == 1 ? 'for free' : `for ${formatEther(elijahPrice * BigInt(amount) / BigInt(1_000_000)) || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice * BigInt(amount))} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
-        {isConnected && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
+        <div>{mintable ? (canAfford || numberOfFreeMints as bigint > 0) ? (<span>grats! you can mint {mintStage == 1 || numberOfFreeMints as bigint > 0 ? 'for free' : `for ${formatEther(elijahPrice * BigInt(amount) / BigInt(1_000_000)) || ''.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}mln $elijah / ${formatEther(ethPrice * BigInt(amount))} eth`}</span>) : `need mor ${whichCurrency == 'elijah' ? '$elijah' : 'eth'}` : isConnected ? (<span>you can't mint just yet.</span>) : (<span>connect your wallet to mint</span>)}</div>
+        {isConnected && numberOfFreeMints as bigint <= 0 && (((amtElijahAllowed || 0) as bigint) < elijahPrice * BigInt(amount)) && whichCurrency == 'elijah' ? (<div>you need to approve the smart contract to spend your $elijah</div>) : (<div></div>)}
         </>
       )}
       {txHash !== "" && (
@@ -327,13 +327,13 @@ export const ElijahMint = ({invert, setInvert} = defaultInvertable) => {
     </div>
     </>)}
 
-    {mintStage as bigint > 1 && (
+    {mintStage as bigint > 1 && numberOfFreeMints as bigint > 0 && (
        <div onClick={() => {setAmount((c)=>Math.min(42, c + 1))}} className={`cursor-pointer absolute w-[36px] h-[64px] left-[276px] top-[37px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>+</div>
     ) }
     <div className={`box-border absolute w-[228px] h-[62px] left-[38px] top-[37px] border-2 ${invert ? "border-white" : "border-black"} text-center font-ultra text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>
     {amount}
   </div>
-  {mintStage as bigint > 1 && (
+  {mintStage as bigint > 1 && numberOfFreeMints as bigint > 0 &&(
   <div onClick={() => {setAmount((c)=>Math.max(1, c - 1))}} className={`cursor-pointer select-none absolute w-[21px] h-[64px] left-0 top-[35px] text-center font-ultra font-normal text-[50px] leading-[64px] ${invert ? "text-white" : "text-black"}`}>-</div>
   )}
     <div className={`absolute w-[207px] h-[17px] left-[53px] top-[110px] text-center font-mono font-normal text-[15px] leading-[17px] ${invert ? "text-white" : "text-black"}`}>
